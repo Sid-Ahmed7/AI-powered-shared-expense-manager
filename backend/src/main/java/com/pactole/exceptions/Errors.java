@@ -1,6 +1,5 @@
 package com.pactole.exceptions;
 
-
 public final class Errors {
 
     private Errors() {
@@ -21,27 +20,66 @@ public final class Errors {
     }
 
     public static class NotFound extends RuntimeException {
-        public NotFound(String message) {
-            super(message);
+        private final String messageKey;
+        private final Object[] args;
+
+        public NotFound(String messageKey, Object... args) {
+            super(messageKey);
+            this.messageKey = messageKey;
+            this.args = args != null ? args : new Object[0];
         }
+
+        public String getMessageKey() { return messageKey; }
+        public Object[] getArgs() { return args; }
     }
 
     public static class Unauthorized extends RuntimeException {
-        public Unauthorized(String message) {
-            super(message);
+        private final String messageKey;
+        private final Object[] args;
+
+        public Unauthorized(String messageKey, Object... args) {
+            super(messageKey);
+            this.messageKey = messageKey;
+            this.args = args != null ? args : new Object[0];
         }
+
+        public String getMessageKey() { return messageKey; }
+        public Object[] getArgs() { return args; }
     }
 
     public static class Forbidden extends RuntimeException {
-        public Forbidden(String message) {
-            super(message);
+        private final String messageKey;
+        private final Object[] args;
+
+        public Forbidden(String messageKey, Object... args) {
+            super(messageKey);
+            this.messageKey = messageKey;
+            this.args = args != null ? args : new Object[0];
         }
+
+        public String getMessageKey() { return messageKey; }
+        public Object[] getArgs() { return args; }
     }
 
     public static class Conflict extends RuntimeException {
-        public Conflict(String message) {
-            super(message);
+        private final String messageKey;
+        private final Object[] args;
+        private final String code;
+
+        public Conflict(String messageKey) {
+            this(messageKey, null);
         }
+
+        public Conflict(String messageKey, String code, Object... args) {
+            super(messageKey);
+            this.messageKey = messageKey;
+            this.code = code;
+            this.args = args != null ? args : new Object[0];
+        }
+
+        public String getMessageKey() { return messageKey; }
+        public Object[] getArgs() { return args; }
+        public String getCode() { return code; }
     }
 
     public static class AiUnavailable extends RuntimeException {

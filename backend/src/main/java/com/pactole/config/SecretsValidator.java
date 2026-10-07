@@ -21,13 +21,13 @@ public class SecretsValidator {
             Environment environment) {
 
         if (secret.isBlank()) {
-            throw new IllegalStateException("JWT_SECRET manquant (générez-le avec : openssl rand -base64 32)");
+            throw new IllegalStateException("JWT_SECRET manquant");
         }
         byte[] decoded;
         try {
             decoded = Base64.getDecoder().decode(secret.strip());
         } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("JWT_SECRET doit être encodé en base64 (openssl rand -base64 32)", e);
+            throw new IllegalStateException("JWT_SECRET doit être encodé en base64 ", e);
         }
         if (decoded.length < 32) {
             throw new IllegalStateException("JWT_SECRET trop court : 256 bits (32 octets) minimum pour HS256");

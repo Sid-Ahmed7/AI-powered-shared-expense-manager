@@ -14,6 +14,13 @@ public final class CommonConstants {
     public static final String HEADER = "X-Request-Id";
     public static final String MDC_KEY = "requestId";
     public static final Pattern SAFE = Pattern.compile("[A-Za-z0-9-]{8,64}");
+    public static final String NORMALIZE_FORM = "[\\p{InCombiningDiacriticalMarks}]";
+    public static final Integer MIN_LENGTH = 12;
+    public static final Integer MAX_BYTES = 72;
+    public static final String PASSWORD_TXT = "/security/common-passwords.txt";
+    public static final int MAX_KEYS = 200_000;
+    public static final String PATH = "/api/auth";
+
 
 
 }

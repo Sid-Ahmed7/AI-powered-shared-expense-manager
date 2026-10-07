@@ -35,22 +35,28 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(Errors.NotFound.class)
     ProblemDetail notFound(Errors.NotFound e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+        String detail = messages.getMessage(e.getMessageKey(), e.getArgs(), e.getMessageKey(), CurrentLocale.getCurrentLocale());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, detail);
     }
 
     @ExceptionHandler(Errors.Unauthorized.class)
     ProblemDetail unauthorized(Errors.Unauthorized e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.getMessage());
+        String detail = messages.getMessage(e.getMessageKey(), e.getArgs(), e.getMessageKey(), CurrentLocale.getCurrentLocale());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, detail);
     }
 
     @ExceptionHandler(Errors.Forbidden.class)
     ProblemDetail forbidden(Errors.Forbidden e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, e.getMessage());
+        String detail = messages.getMessage(e.getMessageKey(), e.getArgs(), e.getMessageKey(), CurrentLocale.getCurrentLocale());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, detail);
     }
 
     @ExceptionHandler(Errors.Conflict.class)
-    ProblemDetail conflict(Errors.Conflict e) {
-        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+    ResponseEntity<ProblemDetail> conflict(Errors.Conflict e) {
+        String detail = messages.getMessage(e.getMessageKey(), e.getArgs(), e.getMessageKey(), CurrentLocale.getCurrentLocale());
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, detail);
+        if (e.getCode() != null) pd.setProperty("code", e.getCode());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
     }
 
     @ExceptionHandler(Errors.AiUnavailable.class)
@@ -93,5 +99,4 @@ public class ApiExceptionHandler {
         String detail = messages.getMessage("error.internal", null, "An unexpected error occurred", CurrentLocale.getCurrentLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, detail);
     }
-
 }
