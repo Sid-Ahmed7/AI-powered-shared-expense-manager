@@ -1,6 +1,6 @@
 
 CREATE TABLE refresh_tokens (
-    id                BIGSERIAL    PRIMARY KEY,
+    id                UUID    PRIMARY KEY,
     user_id           UUID       NOT NULL,
     family_id         UUID         NOT NULL,
     token_hash        CHAR(64)     NOT NULL UNIQUE,

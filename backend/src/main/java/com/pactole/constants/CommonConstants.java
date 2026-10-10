@@ -20,7 +20,7 @@ public final class CommonConstants {
     public static final String PASSWORD_TXT = "/security/common-passwords.txt";
     public static final int MAX_KEYS = 200_000;
     public static final String PATH = "/api/auth";
-
+    public static final String FIELD_CLEAN = "Nom Complet";
 
 
 }

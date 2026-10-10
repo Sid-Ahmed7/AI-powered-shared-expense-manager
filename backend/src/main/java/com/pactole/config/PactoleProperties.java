@@ -5,11 +5,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.List;
 
 @ConfigurationProperties(prefix = "pactole")
-public record PactoleProperties(List<String> corsOrigins, Jwt jwt, Security security, Ai ai) {
+public record PactoleProperties(List<String> corsOrigins, Security security, Ai ai) {
 
-    public record Security(Refresh refresh, Lockout lockout, RateLimits rateLimits) {}
+    public record Security(Refresh refresh, Lockout lockout, RateLimits rateLimits, Jwt jwt) {}
 
-    public record Jwt(String secret, String issuer, String audience, int accessTokenMinutes) {}
+    public record Jwt(String secret, String issuer, String audience, int accessTokenMinutes, String sessionClaim) {}
 
     public record Refresh(String cookieName, boolean cookieSecure, int slidingDays, int absoluteDays, int reuseGraceSeconds) {}
 

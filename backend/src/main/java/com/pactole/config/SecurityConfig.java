@@ -124,7 +124,7 @@ public class SecurityConfig {
     @Bean
     JwtDecoder jwtDecoder() {
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey()).macAlgorithm(MacAlgorithm.HS256).build();
-        PactoleProperties.Jwt jwt = properties.jwt();
+        PactoleProperties.Jwt jwt = properties.security().jwt();
 
         OAuth2TokenValidator<Jwt> base = (jwt.issuer() != null && !jwt.issuer().isBlank())
                 ? JwtValidators.createDefaultWithIssuer(jwt.issuer())
