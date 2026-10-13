@@ -3,7 +3,7 @@ package com.pactole.services.auth;
 import java.util.UUID;
 
 import com.pactole.common.ClientInfo;
-import com.pactole.dto.response.AuthResponse;
+import com.pactole.dto.response.auth.AuthResponse;
 import com.pactole.entities.Account;
 
 public interface IAuthService {

@@ -1,7 +1,7 @@
 package com.pactole.security;
 
 import com.pactole.config.PactoleProperties;
-import com.pactole.dto.response.AccessTokenResponse;
+import com.pactole.dto.response.token.AccessTokenResponse;
 import com.pactole.entities.Account;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;

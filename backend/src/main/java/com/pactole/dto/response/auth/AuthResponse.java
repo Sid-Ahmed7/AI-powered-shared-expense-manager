@@ -1,4 +1,4 @@
-package com.pactole.dto.response;
+package com.pactole.dto.response.auth;
 
 import com.pactole.entities.Account;
 import com.pactole.services.refreshToken.SessionService;

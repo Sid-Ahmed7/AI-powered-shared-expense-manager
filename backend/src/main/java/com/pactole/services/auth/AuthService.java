@@ -8,7 +8,7 @@ import com.pactole.common.EmailNormalizer;
 import com.pactole.common.InputSanitizer;
 import com.pactole.config.PactoleProperties;
 import com.pactole.constants.CommonConstants;
-import com.pactole.dto.response.AuthResponse;
+import com.pactole.dto.response.auth.AuthResponse;
 import com.pactole.entities.Account;
 import com.pactole.exceptions.Errors;
 import com.pactole.repository.AccountRepository;
