@@ -11,9 +11,9 @@ public class MemberBuilder {
 
     public Member build(UUID groupId, String name, UUID accountId) {
         return Member.builder()
-                .groupId(groupId)
-                .name(name)
-                .accountId(accountId)
-                .build();
+            .groupId(groupId)
+            .name(name)
+            .accountId(accountId)
+            .build();
     }
 }

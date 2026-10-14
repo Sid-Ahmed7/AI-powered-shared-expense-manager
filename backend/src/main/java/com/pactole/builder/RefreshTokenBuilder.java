@@ -14,13 +14,13 @@ public class RefreshTokenBuilder {
 
     public RefreshToken buildRefreshToken(UUID userId, UUID familyId, String tokenHash, Instant familyStartedAt, Instant expiresAt, ClientInfo client) {
         return RefreshToken.builder()
-                .userId(userId)
-                .familyId(familyId)
-                .tokenHash(HashToken.hash(tokenHash))
-                .familyStartedAt(familyStartedAt)
-                .expiresAt(expiresAt)
-                .userAgent(client == null ? null : client.userAgent())
-                .ip(client == null ? null : client.ip())
-                .build();
+            .userId(userId)
+            .familyId(familyId)
+            .tokenHash(HashToken.hash(tokenHash))
+            .familyStartedAt(familyStartedAt)
+            .expiresAt(expiresAt)
+            .userAgent(client == null ? null : client.userAgent())
+            .ip(client == null ? null : client.ip())
+            .build();
     }
 }
