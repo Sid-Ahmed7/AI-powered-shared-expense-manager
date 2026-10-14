@@ -6,16 +6,22 @@ import com.pactole.mapping.CategoryMappings;
 
 
 public enum Category {
-    COURSES,
-    RESTAURANT,
-    LOGEMENT,
-    TRANSPORT,
-    LOISIRS,
-    VOYAGE,
-    FACTURES,
-    SANTE,
-    CADEAUX,
-    AUTRE;
+    COURSES("Courses"),
+    RESTAURANT("Restaurant"),
+    LOGEMENT("Logement"),
+    TRANSPORT("Transport"),
+    LOISIRS("Loisirs"),
+    VOYAGE("Voyage"),
+    FACTURES("Factures"),
+    SANTE("Santé"),
+    CADEAUX("Cadeaux"),
+    AUTRE("Autre");
+
+    private final String label;
+
+    Category(String label) { this.label = label; }
+
+    public String label() { return label; }
 
     public static Category parse(String value) {
         if (value == null || value.isBlank()) return AUTRE;
