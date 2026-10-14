@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -26,7 +27,7 @@ public final class SplitCalculator {
 
     public static Map<UUID, Long> compute(long amountCents, SplitMode mode, List<Input> inputs, List<Item> items) {
         if (amountCents <= 0) {
-            throw new Errors.Validation("Le montant doit être positif");
+            throw new Errors.Validation("split.amount.positive");
         }
         return switch (mode) {
             case EQUAL -> equal(amountCents, ids(inputs));
@@ -49,15 +50,14 @@ public final class SplitCalculator {
         long sum = 0;
         for (Input in : inputs) {
             if (in.value() == null || in.value().signum() < 0) {
-                throw new Errors.Validation("Montant invalide pour le membre " + in.memberId());
+                throw new Errors.Validation("split.amount.invalid.member", in.memberId());
             }
             long cents = toCents(in.value());
             result.merge(in.memberId(), cents, Long::sum);
             sum += cents;
         }
         if (sum != amountCents) {
-            throw new Errors.Validation("La somme des montants (" + format(sum)
-                    + ") ne correspond pas au total (" + format(amountCents) + ")");
+            throw new Errors.Validation("split.exact.sum.mismatch", format(sum), format(amountCents));
         }
         return result;
     }
@@ -66,7 +66,7 @@ public final class SplitCalculator {
         requireParticipants(ids(inputs));
         BigDecimal total = inputs.stream().map(i -> nonNegative(i.value())).reduce(BigDecimal.ZERO, BigDecimal::add);
         if (total.subtract(BigDecimal.valueOf(100)).abs().compareTo(new BigDecimal("0.01")) > 0) {
-            throw new Errors.Validation("Les pourcentages doivent faire 100 % (actuellement " + total + " %)");
+            throw new Errors.Validation("split.percent.total", total);
         }
         return allocate(amountCents, ids(inputs), inputs.stream().map(Input::value).toList());
     }
@@ -75,22 +75,22 @@ public final class SplitCalculator {
         requireParticipants(ids(inputs));
         List<BigDecimal> weights = inputs.stream().map(i -> nonNegative(i.value())).toList();
         if (weights.stream().allMatch(w -> w.signum() == 0)) {
-            throw new Errors.Validation("Au moins une part doit être positive");
+            throw new Errors.Validation("split.shares.positive");
         }
         return allocate(amountCents, ids(inputs), weights);
     }
 
     static Map<UUID, Long> itemized(long amountCents, List<Item> items) {
         if (items == null || items.isEmpty()) {
-            throw new Errors.Validation("Aucun article");
+            throw new Errors.Validation("split.itemized.empty");
         }
         Map<UUID, Long> subtotal = new LinkedHashMap<>();
         for (Item item : items) {
             if (item.memberIds() == null || item.memberIds().isEmpty()) {
-                throw new Errors.Validation("L'article \"" + item.label() + "\" n'est attribué à personne");
+                throw new Errors.Validation("split.item.no.member", item.label());
             }
             if (item.amountCents() < 0) {
-                throw new Errors.Validation("Montant négatif pour \"" + item.label() + "\"");
+                throw new Errors.Validation("split.item.negative.amount", item.label());
             }
             List<UUID> unique = List.copyOf(new LinkedHashSet<>(item.memberIds()));
             equalOrZero(item.amountCents(), unique).forEach((id, cents) -> subtotal.merge(id, cents, Long::sum));
@@ -105,7 +105,7 @@ public final class SplitCalculator {
     static Map<UUID, Long> allocate(long total, List<UUID> ids, List<BigDecimal> weights) {
         BigDecimal weightSum = weights.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
         if (weightSum.signum() <= 0) {
-            throw new Errors.Validation("Les poids doivent être positifs");
+            throw new Errors.Validation("split.weights.positive");
         }
         BigDecimal bigTotal = BigDecimal.valueOf(total);
         List<Part> parts = new ArrayList<>();
@@ -142,8 +142,12 @@ public final class SplitCalculator {
         return euros.setScale(2, RoundingMode.HALF_UP).movePointRight(2).longValueExact();
     }
 
+    public static String format(long cents, Locale locale) {
+        return String.format(locale, "%.2f €", BigDecimal.valueOf(cents).movePointLeft(2));
+    }
+
     public static String format(long cents) {
-        return BigDecimal.valueOf(cents).movePointLeft(2).toPlainString().replace('.', ',') + " €";
+        return format(cents, Locale.FRENCH);
     }
 
     private static List<UUID> ids(List<Input> inputs) {
@@ -152,17 +156,17 @@ public final class SplitCalculator {
 
     private static void requireParticipants(List<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
-            throw new Errors.Validation("Il faut au moins un participant");
+            throw new Errors.Validation("split.no.participants");
         }
         Set<UUID> unique = new LinkedHashSet<>(ids);
         if (unique.size() != ids.size()) {
-            throw new Errors.Validation("Un participant apparaît plusieurs fois");
+            throw new Errors.Validation("split.duplicate.participant");
         }
     }
 
     private static BigDecimal nonNegative(BigDecimal value) {
         if (value == null || value.signum() < 0) {
-            throw new Errors.Validation("Valeur négative ou manquante");
+            throw new Errors.Validation("split.value.negative");
         }
         return value;
     }

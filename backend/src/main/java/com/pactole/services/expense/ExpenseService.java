@@ -63,7 +63,7 @@ public class ExpenseService implements IExpenseService {
         IGroupAccess.Context ctx = groupAccess.context(groupId, accountId);
         Expense expense = loadExpense(groupId, expenseId);
         if (request.getVersion() != null && request.getVersion() != expense.getVersion()) {
-            throw new Errors.Conflict("Cette dépense a été modifiée entre-temps. Rechargez avant de la modifier.");
+            throw new Errors.Conflict("expense.optimistic.lock");
         }
         applyRequest(ctx, expense, request, accountId);
         return expense;    }
@@ -121,7 +121,7 @@ public class ExpenseService implements IExpenseService {
     private Expense loadExpense(UUID groupId, UUID expenseId) {
         return expenseRepository.findById(expenseId)
                 .filter(e -> groupId.equals(e.getGroupId()))
-                .orElseThrow(() -> new Errors.NotFound("Dépense introuvable"));
+                .orElseThrow(() -> new Errors.NotFound("expense.not.found"));
     }
 
     static String escapeLike(String value) {
@@ -132,7 +132,7 @@ public class ExpenseService implements IExpenseService {
     private void applyRequest(IGroupAccess.Context ctx, Expense expense, ExpenseRequest request, UUID editorId) {
         LocalDate today = LocalDate.now();
         if (request.getDate() != null && (request.getDate().isAfter(today.plusYears(1)) || request.getDate().isBefore(today.minusYears(10)))) {
-            throw new Errors.Validation("Date de dépense invalide");
+            throw new Errors.Validation("expense.date.invalid");
         }
         long amountCents = SplitCalculator.toCents(request.getAmount());
         ctx.member(request.getPayerMemberId());
@@ -144,7 +144,7 @@ public class ExpenseService implements IExpenseService {
 
         if (request.getSplitMode() == SplitMode.ITEMIZED) {
             if (request.getItems() == null || request.getItems().isEmpty()) {
-                throw new Errors.Validation("Le mode « par article » nécessite au moins un article");
+                throw new Errors.Validation("expense.itemized.required");
             }
             calcItems = new ArrayList<>();
             storedItems = new ArrayList<>();
@@ -192,9 +192,8 @@ public class ExpenseService implements IExpenseService {
             if (existing.getId().equals(ignoreId)) continue;
             if (TextMatching.likelyDuplicate(candidate.getDescription(), candidate.getAmountCents(), candidate.getDate(),
                     existing.getDescription(), existing.getAmountCents(), existing.getDate())) {
-                throw new DuplicateExpenseException("Une dépense très proche existe déjà : « " + existing.getDescription()
-                        + " » (" + SplitCalculator.format(existing.getAmountCents()) + ", le " + existing.getDate()
-                        + "). Enregistrer quand même ?", existing.getId());
+                throw new DuplicateExpenseException("expense.duplicate", existing.getId(),
+                        existing.getDescription(), SplitCalculator.format(existing.getAmountCents()), existing.getDate());
             }
         }
     }

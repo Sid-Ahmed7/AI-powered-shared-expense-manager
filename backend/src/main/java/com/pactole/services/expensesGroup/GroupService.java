@@ -44,9 +44,9 @@ public class GroupService implements IGroupService {
     @Transactional
     public ExpenseGroup create(UUID accountId, String name, String currency, List<String> otherMembers) {
         Account account = accountRepository.findById(accountId)
-                .orElseThrow(() -> new Errors.NotFound("Utilisateur introuvable"));
+                .orElseThrow(() -> new Errors.NotFound("account.not.found"));
         if (otherMembers != null && otherMembers.size() > CommonConstants.MAX_MEMBERS - 1) {
-            throw new Errors.Validation("Un groupe est limité à " + CommonConstants.MAX_MEMBERS + " membres");
+            throw new Errors.Validation("group.max.members", CommonConstants.MAX_MEMBERS);
         }
         ExpenseGroup group = expenseGroupRepository.save(expenseGroupBuilder.build(
                 validName(name),
@@ -72,11 +72,11 @@ public class GroupService implements IGroupService {
     public Member addMember(UUID groupId, UUID accountId, String name) {
         access.requireMember(groupId, accountId);
         if (memberRepository.countByGroupId(groupId) >= CommonConstants.MAX_MEMBERS) {
-            throw new Errors.Validation("Un groupe est limité à " + CommonConstants.MAX_MEMBERS + " membres");
+            throw new Errors.Validation("group.max.members", CommonConstants.MAX_MEMBERS);
         }
         String clean = cleanName(name);
         if (memberRepository.existsByGroupIdAndNameIgnoreCase(groupId, clean)) {
-            throw new Errors.Conflict("Il y a déjà un membre « " + clean + " » dans ce groupe");
+            throw new Errors.Conflict("group.member.duplicate.name", null, clean);
         }
         return memberRepository.save(memberOf(groupId, clean, null));
     }
@@ -109,9 +109,9 @@ public class GroupService implements IGroupService {
     public ExpenseGroup byInviteCode(String code) {
         String normalized = code == null ? "" : code.strip().toUpperCase();
         if (!CommonConstants.INVITE_FORMAT.matcher(normalized).matches()) {
-            throw new Errors.NotFound("Code d'invitation invalide");
+            throw new Errors.NotFound("group.invite.invalid");
         }
-        return expenseGroupRepository.findByInviteCode(normalized).orElseThrow(() -> new Errors.NotFound("Code d'invitation invalide"));
+        return expenseGroupRepository.findByInviteCode(normalized).orElseThrow(() -> new Errors.NotFound("group.invite.invalid"));
     }
 
     @Override
@@ -123,10 +123,10 @@ public class GroupService implements IGroupService {
         }
         if (claimMemberId != null) {
             if (memberRepository.claimIfFree(claimMemberId, group.getId(), accountId) == 0) {
-                throw new Errors.Conflict("Ce membre n'existe pas ou est déjà associé à un compte");
+                throw new Errors.Conflict("group.member.link.invalid");
             }
         } else {
-            Account account = accountRepository.findById(accountId).orElseThrow(() -> new Errors.NotFound("Utilisateur introuvable"));
+            Account account = accountRepository.findById(accountId).orElseThrow(() -> new Errors.NotFound("account.not.found"));
             String name = account.getFullName();
             int suffix = 2;
             while (memberRepository.existsByGroupIdAndNameIgnoreCase(group.getId(), name)) {
@@ -142,14 +142,14 @@ public class GroupService implements IGroupService {
     }
 
     private static String validName(String name) {
-        if (name == null || name.isBlank()) throw new Errors.Validation("Nom du groupe requis");
+        if (name == null || name.isBlank()) throw new Errors.Validation("group.name.required");
         String trimmed = name.strip();
-        if (trimmed.length() > 80) throw new Errors.Validation("Nom du groupe trop long (80 caractères max)");
+        if (trimmed.length() > 80) throw new Errors.Validation("group.name.too.long");
         return trimmed;
     }
 
     private static String cleanName(String name) {
-        if (name == null || name.isBlank()) throw new Errors.Validation("Prénom requis");
+        if (name == null || name.isBlank()) throw new Errors.Validation("member.name.required");
         return name.strip();
     }
 

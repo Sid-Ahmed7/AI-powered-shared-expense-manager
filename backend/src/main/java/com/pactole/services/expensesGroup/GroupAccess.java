@@ -27,7 +27,7 @@ public class GroupAccess implements IGroupAccess {
 
     @Override
     public Member requireMember(UUID groupId, UUID accountId) {
-        return memberRepository.findByGroupIdAndAccountId(groupId, accountId).orElseThrow(() -> new Errors.NotFound("Group introuvable"));
+        return memberRepository.findByGroupIdAndAccountId(groupId, accountId).orElseThrow(() -> new Errors.NotFound("group.member.not.found"));
     }
 
     @Override
@@ -36,7 +36,7 @@ public class GroupAccess implements IGroupAccess {
         UUID ownerId = ctx.group().getCreatedBy();
         boolean ownerGone = accountRepository.findById(ownerId).map(Account::isDeleted).orElse(true);
         if (!ownerId.equals(accountId) && !ownerGone) {
-            throw new Errors.Forbidden("Seul le créateur du groupe peut faire cette action");
+            throw new Errors.Forbidden("group.owner.required");
         }
         return ctx;
     }
@@ -49,7 +49,7 @@ public class GroupAccess implements IGroupAccess {
     @Override
     public Context context(UUID groupId, UUID accountId) {
         Member me = requireMember(groupId, accountId);
-        ExpenseGroup group = groupRepository.findById(groupId).orElseThrow(() -> new Errors.NotFound("Groupe introuvable"));
+        ExpenseGroup group = groupRepository.findById(groupId).orElseThrow(() -> new Errors.NotFound("group.not.found"));
         return new Context(group, me, memberRepository.findByGroupIdOrderByIdAsc(groupId));
     }
 

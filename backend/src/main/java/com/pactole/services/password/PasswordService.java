@@ -27,10 +27,10 @@ public class PasswordService implements IPasswordService {
     public void requirePassword(Account account, String password) {
         long wait = rateLimiter.tryAcquire(limits.loginPerEmail, account.getEmail());
         if (wait > 0) {
-            throw new Errors.TooManyRequests("Trop de tentatives, réessayez dans " + wait + " s", wait);
+            throw new Errors.TooManyRequests("rate.limit.exceeded", wait);
         }
         if (password == null || !passwordEncoder.matches(password, account.getPassword())) {
-            throw new Errors.Forbidden("Mot de passe actuel incorrect");
+            throw new Errors.Forbidden("auth.password.current.invalid");
         }
     }
     
@@ -41,7 +41,7 @@ public class PasswordService implements IPasswordService {
     public void validateNewPassword(String password, Account account) {
         passwordPolicy.validate(password, account.getEmail(), account.getFullName());
         if (passwordEncoder.matches(password, account.getPassword())) {
-            throw new Errors.Validation("Le nouveau mot de passe doit être différent de l'actuel");
+            throw new Errors.Validation("auth.password.same");
         }
     }
     

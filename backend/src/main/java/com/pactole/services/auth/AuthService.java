@@ -54,7 +54,7 @@ public class AuthService implements IAuthService {
         passwordPolicy.validate(password, accountEmail, name);
 
         if(accountRepository.existsByEmail(accountEmail)) {
-            throw new Errors.Conflict("Un compte existe déjà avec cet email");
+            throw new Errors.Conflict("auth.email.exists");
         }
         Account account = accountRepository.save(new Account(accountEmail, passwordService.encodePassword(password), name));
         account.recordSuccessfulLogin(Instant.now());
@@ -68,7 +68,7 @@ public class AuthService implements IAuthService {
         long wait = rateLimiter.tryAcquire(limits.loginPerEmail, accountEmail);
 
         if(wait > 0) {
-            throw new Errors.TooManyRequests("Trop de tentatives pour ce compte, réessayez dans " + wait + " s", wait);
+            throw new Errors.TooManyRequests("auth.rate.limit", wait);
         }
 
         String userPassword = password == null ? "" : password;
@@ -76,19 +76,19 @@ public class AuthService implements IAuthService {
 
         if(accountFound.isEmpty()) {
             passwordEncoder.matches(userPassword, randomHash);;
-            throw new Errors.TooManyRequests("Trop de tentatives pour ce compte, réessayez dans " + wait + " s", wait);
+            throw new Errors.TooManyRequests("auth.rate.limit", wait);
         }
 
         Account account = accountFound.get();
         Instant now = Instant.now();
         if (account.isLocked(now)) {
             passwordEncoder.matches(userPassword, randomHash);
-            throw new Errors.Unauthorized("Trop de tentatives pour ce compte, réessayez dans " + wait + " s", wait);
+            throw new Errors.Unauthorized("auth.rate.limit", wait);
         }
 
         if (!passwordEncoder.matches(userPassword, account.getPassword())) {
         
-            throw new Errors.Unauthorized("Trop de tentatives pour ce compte, réessayez dans " + wait + " s", wait);
+            throw new Errors.Unauthorized("auth.rate.limit", wait);
         }
 
         account.recordSuccessfulLogin(now);
@@ -102,6 +102,6 @@ public class AuthService implements IAuthService {
 
     @Transactional
     public Account activeAccount(UUID accountId) {
-        return accountRepository.findById(accountId).filter(account -> !account.isDeleted()).orElseThrow(() -> new Errors.Unauthorized("Session expirée, reconnectez-vous"));
+        return accountRepository.findById(accountId).filter(account -> !account.isDeleted()).orElseThrow(() -> new Errors.Unauthorized("auth.session.expired"));
     }
 }

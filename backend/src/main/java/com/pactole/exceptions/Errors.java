@@ -83,21 +83,31 @@ public final class Errors {
     }
 
     public static class AiUnavailable extends RuntimeException {
-        public AiUnavailable(String message) {
-            super(message);
+        private final String messageKey;
+
+        public AiUnavailable(String messageKey) {
+            super(messageKey);
+            this.messageKey = messageKey;
         }
+
+        public String getMessageKey() { return messageKey; }
+        public Object[] getArgs() { return new Object[0]; }
     }
 
     public static class TooManyRequests extends RuntimeException {
+        private final String messageKey;
+        private final Object[] args;
         private final long retryAfterSeconds;
 
-        public TooManyRequests(String message, long retryAfterSeconds) {
-            super(message);
+        public TooManyRequests(String messageKey, long retryAfterSeconds) {
+            super(messageKey);
+            this.messageKey = messageKey;
             this.retryAfterSeconds = retryAfterSeconds;
+            this.args = new Object[]{retryAfterSeconds};
         }
 
-        public long retryAfterSeconds() {
-            return retryAfterSeconds;
-        }
+        public String getMessageKey() { return messageKey; }
+        public Object[] getArgs() { return args; }
+        public long retryAfterSeconds() { return retryAfterSeconds; }
     }
 }

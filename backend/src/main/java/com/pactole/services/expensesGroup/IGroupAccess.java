@@ -18,7 +18,7 @@ public interface IGroupAccess {
         }
 
         public Member member(UUID memberId) {
-            return members.stream().filter(m -> memberId.equals(m.getId())).findFirst().orElseThrow(() -> new Errors.Validation("Le membre " + memberId + " ne fait pas partie du groupe"));
+            return members.stream().filter(m -> memberId.equals(m.getId())).findFirst().orElseThrow(() -> new Errors.Validation("group.member.not.in.group", memberId));
         }
     }
 
