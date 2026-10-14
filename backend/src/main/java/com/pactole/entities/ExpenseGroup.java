@@ -33,6 +33,7 @@ public class ExpenseGroup {
     private String name;
 
     @Column(nullable = false)
+    @Builder.Default
     private String currency = "EUR";
 
     @Column(name = "invite_code", nullable = false, unique = true)
@@ -42,5 +43,6 @@ public class ExpenseGroup {
     private UUID createdBy;
 
     @Column(name = "created_at", nullable = false)
+    @Builder.Default
     private Instant createdAt = Instant.now();
 }
