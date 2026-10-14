@@ -1,30 +1,26 @@
 package com.pactole.builder;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
+import java.time.Instant;
+import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
 import com.pactole.common.ClientInfo;
 import com.pactole.common.HashToken;
-import com.pactole.dto.request.refresh.RefreshTokenRequest;
 import com.pactole.entities.RefreshToken;
 
-@Component 
+@Component
 public class RefreshTokenBuilder {
 
-    public RefreshToken buildRefreshToken(RefreshTokenRequest refreshTokenRequest, ClientInfo client) {
+    public RefreshToken buildRefreshToken(UUID userId, UUID familyId, String tokenHash, Instant familyStartedAt, Instant expiresAt, ClientInfo client) {
         return RefreshToken.builder()
-                .userId(refreshTokenRequest.getUserId())
-                .familyId(refreshTokenRequest.getFamilyId())
-                .tokenHash(HashToken.hash(refreshTokenRequest.getTokenHash()))
-                .familyStartedAt(refreshTokenRequest.getFamilyStartedAt())
-                .expiresAt(refreshTokenRequest.getExpiresAt())
+                .userId(userId)
+                .familyId(familyId)
+                .tokenHash(HashToken.hash(tokenHash))
+                .familyStartedAt(familyStartedAt)
+                .expiresAt(expiresAt)
                 .userAgent(client == null ? null : client.userAgent())
                 .ip(client == null ? null : client.ip())
                 .build();
     }
-
 }

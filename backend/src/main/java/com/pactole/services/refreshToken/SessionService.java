@@ -4,7 +4,6 @@ import com.pactole.builder.RefreshTokenBuilder;
 import com.pactole.common.ClientInfo;
 import com.pactole.common.HashToken;
 import com.pactole.config.PactoleProperties;
-import com.pactole.dto.request.refresh.RefreshTokenRequest;
 import com.pactole.dto.request.session.SessionRequest;
 import com.pactole.dto.request.session.SessionViewRequest;
 import com.pactole.entities.RefreshToken;
@@ -127,8 +126,7 @@ public class SessionService implements ISessionService {
         Instant sliding = now.plus(Duration.ofDays(config.slidingDays()));
         Instant absolute = familyStart.plus(Duration.ofDays(config.absoluteDays()));
         Instant expiresAt = sliding.isBefore(absolute) ? sliding : absolute;
-        tokens.save(refreshTokenBuilder.buildRefreshToken(
-                new RefreshTokenRequest(userId, familyId, raw, familyStart, expiresAt), client));
+        tokens.save(refreshTokenBuilder.buildRefreshToken(userId, familyId, raw, familyStart, expiresAt, client));
         return new IssuedSession(new SessionRequest(userId, familyId, raw, expiresAt));
     }
     

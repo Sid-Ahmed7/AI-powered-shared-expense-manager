@@ -1,5 +1,6 @@
 package com.pactole.constants;
 
+import java.security.SecureRandom;
 import java.util.regex.Pattern;
 
 public final class CommonConstants {
@@ -21,6 +22,8 @@ public final class CommonConstants {
     public static final int MAX_KEYS = 200_000;
     public static final String PATH = "/api/auth";
     public static final String FIELD_CLEAN = "Nom Complet";
-
+    public static final String CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+    public static final Integer MAX_MEMBERS = 50;
+    public static final Pattern INVITE_FORMAT = Pattern.compile("[A-HJ-NP-Z2-9]{8}");
 
 }
