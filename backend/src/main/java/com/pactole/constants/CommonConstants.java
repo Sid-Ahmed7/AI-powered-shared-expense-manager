@@ -1,6 +1,7 @@
 package com.pactole.constants;
 
-import java.security.SecureRandom;
+import java.time.ZoneId;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public final class CommonConstants {
@@ -25,5 +26,13 @@ public final class CommonConstants {
     public static final String CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
     public static final Integer MAX_MEMBERS = 50;
     public static final Pattern INVITE_FORMAT = Pattern.compile("[A-HJ-NP-Z2-9]{8}");
+    public static final Integer MAX_LENGTH_PROMPT = 2000;
+    public static final String FIRST_FORMAT_CONTROL = "[\\p{Cf}]";  
+    public static final String SECOND_FORMAT_CONTROL = "[\\p{Cc}&&[^\\n]]";
+    public static final Set<String> ME = Set.of("moi", "je", "j", "me", "myself");
+    public static final Set<String> ALL = Set.of("tous", "tout le monde", "everyone", "all", "le groupe", "nous");
+    public static final Set<String> IMAGE_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
+    public static final Integer MAX_STEPS = 5;
+    public static final ZoneId ZONE = ZoneId.of("Europe/Paris");
 
 }
