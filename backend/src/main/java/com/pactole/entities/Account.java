@@ -34,7 +34,7 @@ public class Account {
     private String fullName;
 
     @Column(name = "created_at", nullable = false)
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
 
     @Column(name = "failed_login_count", nullable = false)
     private int failedLoginCount;
@@ -46,7 +46,7 @@ public class Account {
     private Instant lastLoginAt;
 
     @Column(name = "password_changed_at", nullable = false)
-    private Instant passwordChangedAt = Instant.now();
+    private Instant passwordChangedAt;
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
@@ -56,6 +56,8 @@ public class Account {
         this.email = email;
         this.password = password;
         this.fullName = fullName;
+        this.createdAt = Instant.now();
+        this.passwordChangedAt = Instant.now();
     }
 
     public boolean isLocked(Instant now) {

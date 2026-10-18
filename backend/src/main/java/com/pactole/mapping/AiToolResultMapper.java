@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.pactole.common.SettlementCalculator;
 import com.pactole.common.SplitCalculator;
+import com.pactole.dto.response.group.MemberBalance;
 import com.pactole.dto.response.stats.Summary;
 import com.pactole.entities.Expense;
 import com.pactole.services.balance.IBalanceService;
@@ -18,11 +19,11 @@ import com.pactole.services.balance.IBalanceService;
 public class AiToolResultMapper {
 
     public Map<String, Object> toBalanceResult(IBalanceService.Balances balances, Map<UUID, String> names) {
-        List<Map<String, Object>> members = balances.members().stream().map(member -> Map.<String, Object>of(
-                "membre", member.getName(),
-                "a_paye", euros(member.getPaidCents()),
-                "a_consomme", euros(member.getConsumedCents()),
-                "solde", euros(member.getNetCents()))).toList();
+        List<Map<String, Object>> members = balances.members().stream().map((MemberBalance member) -> Map.<String, Object>of(
+                "membre", member.name(),
+                "a_paye", euros(member.paidCents()),
+                "a_consomme", euros(member.consumedCents()),
+                "solde", euros(member.netCents()))).toList();
         List<Map<String, Object>> transfers = new ArrayList<>();
         for (SettlementCalculator.Transfer transfer : balances.transfers()) {
             transfers.add(Map.of(

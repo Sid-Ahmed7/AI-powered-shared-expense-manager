@@ -8,8 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data 
-@NoArgsConstructor 
+@Data
+@NoArgsConstructor
 @AllArgsConstructor 
 public class SessionViewRequest {
     private UUID sessionId;

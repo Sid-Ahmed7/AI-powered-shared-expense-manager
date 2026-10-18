@@ -47,13 +47,13 @@ public class BalanceService implements IBalanceService {
         }).toList();
 
         Map<UUID, Long> net = new LinkedHashMap<>();
-        list.forEach(balance -> net.put(balance.getMemberId(), balance.getNetCents()));
+        list.forEach(balance -> net.put(balance.memberId(), balance.netCents()));
         List<SettlementCalculator.Transfer> transfers = SettlementCalculator.simplify(net);
 
-        MemberBalance next = list.stream().min(Comparator.comparingLong(MemberBalance::getNetCents).thenComparing(MemberBalance::getMemberId)).orElse(null);
-        String reason = next == null ? null : next.getNetCents() < 0 ? next.getName() + " a le solde le plus bas du groupe"
+        MemberBalance next = list.stream().min(Comparator.comparingLong(MemberBalance::netCents).thenComparing(MemberBalance::memberId)).orElse(null);
+        String reason = next == null ? null : next.netCents() < 0 ? next.name() + " a le solde le plus bas du groupe"
                 : "Les comptes sont équilibrés, à vous de voir !";
-        return new Balances(list, transfers, next == null ? null : next.getMemberId(), reason);
+        return new Balances(list, transfers, next == null ? null : next.memberId(), reason);
     }
 
     public long netOf(GroupAccess.Context ctx, Member member) {

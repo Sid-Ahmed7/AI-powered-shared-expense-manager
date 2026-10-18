@@ -61,13 +61,13 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(Errors.AiUnavailable.class)
     ProblemDetail aiUnavailable(Errors.AiUnavailable e) {
-        String detail = messages.getMessage("ai.unavailable", null, e.getMessage(), CurrentLocale.getCurrentLocale());
+        String detail = messages.getMessage(e.getMessageKey(), e.getArgs(), e.getMessage(), CurrentLocale.getCurrentLocale());
         return ProblemDetail.forStatusAndDetail(HttpStatus.SERVICE_UNAVAILABLE, detail);
     }
 
     @ExceptionHandler(Errors.TooManyRequests.class)
     ResponseEntity<ProblemDetail> tooManyRequests(Errors.TooManyRequests e) {
-        String detail = messages.getMessage("ai.rate.limit", null, e.getMessage(), CurrentLocale.getCurrentLocale());
+        String detail = messages.getMessage(e.getMessageKey(), e.getArgs(), e.getMessage(), CurrentLocale.getCurrentLocale());
         ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.TOO_MANY_REQUESTS, detail);
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.RETRY_AFTER, String.valueOf(e.retryAfterSeconds()));

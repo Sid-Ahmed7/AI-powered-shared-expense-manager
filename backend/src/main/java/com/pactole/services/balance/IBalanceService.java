@@ -15,7 +15,7 @@ public interface IBalanceService {
       public record Balances(List<MemberBalance> members, List<SettlementCalculator.Transfer> transfers, UUID suggestedNextPayerId, String suggestedNextPayerReason) {
         public Map<UUID, Long> net() {
             Map<UUID, Long> map = new LinkedHashMap<>();
-            members.forEach(member -> map.put(member.getMemberId(), member.getNetCents()));
+            members.forEach(member -> map.put(member.memberId(), member.netCents()));
             return map;
         }
     }
