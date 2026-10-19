@@ -28,7 +28,9 @@ import com.pactole.dto.response.group.JoinPreview;
 import com.pactole.dto.response.group.MemberResponse;
 import com.pactole.entities.ExpenseGroup;
 import com.pactole.repository.ExpenseGroupRepository;
+import com.pactole.repository.ExpenseRepository;
 import com.pactole.repository.MemberRepository;
+import com.pactole.services.balance.BalanceService;
 import com.pactole.services.expensesGroup.GroupAccess;
 import com.pactole.services.expensesGroup.GroupService;
 import com.pactole.services.expensesGroup.IGroupAccess;
@@ -43,12 +45,16 @@ public class ExpenseGroupController {
     private final GroupAccess access;
     private final ExpenseGroupRepository expenseGroupRepository;
     private final MemberRepository memberRepository;
+    private final ExpenseRepository expenseRepository;
+    private final BalanceService balanceService;
 
-    public ExpenseGroupController(GroupService service, GroupAccess access, ExpenseGroupRepository expenseGroupRepository, MemberRepository memberRepository) {
+    public ExpenseGroupController(GroupService service, GroupAccess access, ExpenseGroupRepository expenseGroupRepository, MemberRepository memberRepository, ExpenseRepository expenseRepository, BalanceService balanceService) {
         this.service = service;
         this.access = access;
         this.expenseGroupRepository = expenseGroupRepository;
         this.memberRepository = memberRepository;
+        this.expenseRepository = expenseRepository;
+        this.balanceService = balanceService;
     }
 
     @GetMapping("/groups")
@@ -57,7 +63,9 @@ public class ExpenseGroupController {
         UUID userId = CurrentUser.id(jwt);
         return expenseGroupRepository.findAllForUser(userId).stream().map(g -> {
                     IGroupAccess.Context ctx = access.context(g.getId(), userId);
-                    return new GroupSummary(g.getId(), g.getName(), g.getCurrency(), ctx.members().size());
+                    long expenseCount = expenseRepository.countByGroupId(g.getId());
+                    long myBalance = balanceService.netOf(ctx, ctx.me());
+                    return new GroupSummary(g.getId(), g.getName(), g.getCurrency(), ctx.members().size(), expenseCount, myBalance);
                 }).toList();
     }
 

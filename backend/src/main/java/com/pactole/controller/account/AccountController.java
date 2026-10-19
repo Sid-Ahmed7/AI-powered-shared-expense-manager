@@ -72,4 +72,9 @@ public class AccountController {
         accountService.revokeSession(CurrentUser.id(jwt), sessionId, ClientInfo.of(http));
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/security-events")
+    public List<Object> securityEvents(@AuthenticationPrincipal Jwt jwt) {
+        return List.of();
+    }
 }

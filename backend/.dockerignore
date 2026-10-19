@@ -1,0 +1,4 @@
+target/
+src/test/
+*.md
+src/main/resources/application-dev.properties

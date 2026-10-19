@@ -5,4 +5,4 @@ import com.pactole.dto.response.account.AccountResponse;
 import lombok.Builder;
 
 @Builder 
-public record TokenResponse(String accessToken, long expiresIn, AccountResponse account) {}
+public record TokenResponse(String accessToken, long expiresIn, AccountResponse user) {}

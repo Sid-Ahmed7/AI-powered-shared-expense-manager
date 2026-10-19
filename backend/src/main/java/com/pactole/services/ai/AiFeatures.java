@@ -117,7 +117,7 @@ public class AiFeatures implements IAiFeatures {
                 - Les remises sont des lignes à montant négatif.
                 - N'inclus pas les lignes de sous-total, TVA ou moyen de paiement.
                 """;
-        List<Map<String, Object>> content = List.of(Map.of("type", "text", "text", prompt), Map.of("type", "image_url", "image_url", dataUrl));
+        List<Map<String, Object>> content = List.of(Map.of("type", "text", "text", prompt), Map.of("type", "image_url", "image_url", Map.of("url", dataUrl)));
         JsonNode message = clientAI.chat(clientAI.visionModel(), List.of(Map.of("role", "user", "content", content)), List.of(), true, 0.0);
         return responseMapper.toReceiptDraft(AICommon.parse(mapper, message.path("content").asText()));
     }

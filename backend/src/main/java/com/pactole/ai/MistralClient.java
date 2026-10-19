@@ -28,10 +28,10 @@ public class MistralClient implements IMistralClient {
     private final RestClient http;
     private final ObjectMapper objectMapper;
 
-    public MistralClient(PactoleProperties.Ai aiConfiguration, RestClient.Builder builder, ObjectMapper objectMapper, MistralHttpClientBuilder httpBuilder) {
-        this.aiConfiguration = aiConfiguration;
+    public MistralClient(PactoleProperties properties, RestClient.Builder builder, ObjectMapper objectMapper, MistralHttpClientBuilder httpBuilder) {
+        this.aiConfiguration = properties.ai();
         this.objectMapper = objectMapper;
-        this.http = httpBuilder.build(aiConfiguration, builder);
+        this.http = httpBuilder.build(properties.ai(), builder);
     }
 
     @Override
@@ -75,9 +75,11 @@ public class MistralClient implements IMistralClient {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> {
                     int status = res.getStatusCode().value();
+                    String errorBody = new String(res.getBody().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+                    log.error("Mistral HTTP {} — URL: {} — body: {}", status, req.getURI(), errorBody);
                     if (status == 401) throw new Errors.AiUnavailable("ai.mistral.key.invalid");
                     if (status == 429) throw new Errors.TooManyRequests("ai.mistral.quota", 20);
-                    throw new Errors.AiUnavailable("ai.mistral.error.status");
+                    throw new Errors.AiUnavailable("ai.mistral.error.status", status);
                 })
                 .body(String.class);
             JsonNode response = objectMapper.readTree(raw);
@@ -89,7 +91,7 @@ public class MistralClient implements IMistralClient {
         } catch (Errors.AiUnavailable | Errors.TooManyRequests e) {
             throw e;
         } catch (Exception e) {
-            throw new Errors.AiUnavailable("ai.mistral.parse.error");
+            throw new Errors.AiUnavailable("ai.mistral.parse.error", e.getMessage());
         }
     }
 }

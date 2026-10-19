@@ -56,7 +56,7 @@ public class StatsService implements IStatsService {
 
         Map<UUID, String> names = ctx.names();
         List<CategoryStat> categories = byCategory.entrySet().stream()
-                .map(entry -> new CategoryStat(entry.getKey().label(), entry.getValue()[0], (int) entry.getValue()[1]))
+                .map(entry -> new CategoryStat(entry.getKey().name(), entry.getKey().label(), entry.getValue()[0], (int) entry.getValue()[1]))
                 .sorted(Comparator.comparingLong(CategoryStat::cents).reversed())
                 .toList();
         List<MemberStat> members = byMember.entrySet().stream().map(entry -> new MemberStat(entry.getKey(), names.getOrDefault(entry.getKey(), "?"), entry.getValue()[0], entry.getValue()[1])).toList();

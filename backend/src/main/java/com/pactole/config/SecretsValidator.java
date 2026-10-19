@@ -16,7 +16,7 @@ public class SecretsValidator {
     private final byte[] jwtKey;
 
     public SecretsValidator(
-            @Value("${pactole.jwt.secret:}") String secret,
+            @Value("${pactole.security.jwt.secret:}") String secret,
             @Value("${pactole.security.known-public-secrets:}") String knownPublicSecretsRaw,
             Environment environment) {
 

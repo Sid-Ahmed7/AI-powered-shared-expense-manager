@@ -16,8 +16,10 @@ import com.pactole.entities.Member;
 import com.pactole.entities.Settlement;
 import com.pactole.repository.ExpenseRepository;
 import com.pactole.repository.SettlementRepository;
+import org.springframework.stereotype.Service;
 import com.pactole.services.expensesGroup.GroupAccess;
 
+@Service
 public class BalanceService implements IBalanceService {
 
     private final ExpenseRepository expenseRepository;

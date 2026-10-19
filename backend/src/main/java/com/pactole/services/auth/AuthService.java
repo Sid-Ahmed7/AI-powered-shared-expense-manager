@@ -75,20 +75,20 @@ public class AuthService implements IAuthService {
         Optional<Account> accountFound = accountRepository.findByEmail(accountEmail).filter(account -> !account.isDeleted());
 
         if(accountFound.isEmpty()) {
-            passwordEncoder.matches(userPassword, randomHash);;
-            throw new Errors.TooManyRequests("auth.rate.limit", wait);
+            passwordEncoder.matches(userPassword, randomHash);
+            throw new Errors.Unauthorized("auth.invalid.credentials");
         }
 
         Account account = accountFound.get();
         Instant now = Instant.now();
         if (account.isLocked(now)) {
             passwordEncoder.matches(userPassword, randomHash);
-            throw new Errors.Unauthorized("auth.rate.limit", wait);
+            long remainingSeconds = Math.max(1, account.getLockedUntil().getEpochSecond() - now.getEpochSecond());
+            throw new Errors.TooManyRequests("auth.rate.limit", remainingSeconds);
         }
 
         if (!passwordEncoder.matches(userPassword, account.getPassword())) {
-        
-            throw new Errors.Unauthorized("auth.rate.limit", wait);
+            throw new Errors.Unauthorized("auth.invalid.credentials");
         }
 
         account.recordSuccessfulLogin(now);

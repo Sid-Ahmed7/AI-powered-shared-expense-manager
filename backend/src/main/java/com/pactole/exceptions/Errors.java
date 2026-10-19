@@ -84,14 +84,16 @@ public final class Errors {
 
     public static class AiUnavailable extends RuntimeException {
         private final String messageKey;
+        private final Object[] args;
 
-        public AiUnavailable(String messageKey) {
+        public AiUnavailable(String messageKey, Object... args) {
             super(messageKey);
             this.messageKey = messageKey;
+            this.args = args != null ? args : new Object[0];
         }
 
         public String getMessageKey() { return messageKey; }
-        public Object[] getArgs() { return new Object[0]; }
+        public Object[] getArgs() { return args; }
     }
 
     public static class TooManyRequests extends RuntimeException {
