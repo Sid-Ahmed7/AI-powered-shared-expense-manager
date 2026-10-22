@@ -17,8 +17,7 @@ public class LoginRequest {
     @Size(max = 100)
     private String email;
 
-    @NotBlank 
-    @Size(max = 12)
+    @NotBlank
     private String password;
 
     @Override 

@@ -17,8 +17,8 @@ public class RegisterRequest {
     @Size(max = 100)
     private String email;
 
-    @NotBlank 
-    @Size(max = 12)
+    @NotBlank
+    @Size(min = 12, message = "{validation.password.size}")
     private String password;
 
     @NotBlank 

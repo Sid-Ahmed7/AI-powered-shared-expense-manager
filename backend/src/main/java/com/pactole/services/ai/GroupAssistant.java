@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pactole.ai.MistralClient;
+import com.pactole.ai.AiClient;
 import com.pactole.common.AICommon;
 import com.pactole.common.Messages;
 import com.pactole.common.TextMatching;
@@ -42,7 +42,7 @@ import com.pactole.services.stats.StatsService;
 @Service
 public class GroupAssistant implements IGroupAssistant {
 
-    private final MistralClient clientAi;
+    private final AiClient clientAi;
     private final ObjectMapper mapper;
     private final BalanceService balanceService;
     private final StatsService statsService;
@@ -51,7 +51,7 @@ public class GroupAssistant implements IGroupAssistant {
     private final AiToolResultMapper toolResultMapper;
     private final Messages messages;
 
-    public GroupAssistant(MistralClient clientAi, ObjectMapper mapper, BalanceService balanceService, StatsService statsService, ExpenseRepository expenseRepository, ExpenseService expenseService, AiToolResultMapper toolResultMapper, Messages messages) {
+    public GroupAssistant(AiClient clientAi, ObjectMapper mapper, BalanceService balanceService, StatsService statsService, ExpenseRepository expenseRepository, ExpenseService expenseService, AiToolResultMapper toolResultMapper, Messages messages) {
         this.clientAi = clientAi;
         this.mapper = mapper;
         this.balanceService = balanceService;

@@ -19,7 +19,7 @@ import com.pactole.enums.Category;
 import com.pactole.enums.SplitMode;
 
 @Component
-public class MistralResponseMapper {
+public class AiResponseMapper {
 
     public ExpenseDraft toExpenseDraft(JsonNode node) {
         return new ExpenseDraft(

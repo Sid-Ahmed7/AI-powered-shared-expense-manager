@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-public interface IMistralClient {
+public interface IAiClient {
 
     boolean enabled();
     JsonNode chat(String model, List<Map<String, Object>> messages, List<Map<String, Object>> tools, boolean jsonMode, double temperature);

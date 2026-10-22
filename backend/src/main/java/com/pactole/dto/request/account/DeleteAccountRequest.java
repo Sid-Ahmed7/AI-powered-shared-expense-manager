@@ -1,7 +1,6 @@
 package com.pactole.dto.request.account;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,8 +10,7 @@ import lombok.Setter;
 @Setter 
 public class DeleteAccountRequest {
     
-    @NotBlank 
-    @Size(max = 12)
+    @NotBlank
     private String password;
 
     @Override

@@ -7,11 +7,11 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pactole.ai.MistralClient;
+import com.pactole.ai.AiClient;
 import com.pactole.common.AICommon;
 import com.pactole.common.Messages;
 import com.pactole.common.SplitCalculator;
-import com.pactole.mapping.MistralResponseMapper;
+import com.pactole.mapping.AiResponseMapper;
 import com.pactole.mapping.StatsMapper;
 import com.pactole.dto.response.ai.Recap;
 import com.pactole.dto.response.ai.ReminderResponse;
@@ -23,13 +23,13 @@ import com.pactole.services.expensesGroup.IGroupAccess;
 @Service
 public class AiWriter implements IAiWriter {
 
-    private final MistralClient clientAi;
+    private final AiClient clientAi;
     private final ObjectMapper mapper;
-    private final MistralResponseMapper responseMapper;
+    private final AiResponseMapper responseMapper;
     private final StatsMapper statsMapper;
     private final Messages messages;
 
-    public AiWriter(MistralClient clientAi, ObjectMapper mapper, MistralResponseMapper responseMapper, StatsMapper statsMapper, Messages messages) {
+    public AiWriter(AiClient clientAi, ObjectMapper mapper, AiResponseMapper responseMapper, StatsMapper statsMapper, Messages messages) {
         this.clientAi = clientAi;
         this.mapper = mapper;
         this.responseMapper = responseMapper;

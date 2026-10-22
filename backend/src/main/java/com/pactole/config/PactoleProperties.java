@@ -17,7 +17,7 @@ public record PactoleProperties(List<String> corsOrigins, Security security, Ai 
 
     public record RateLimits(int globalPerIpPerMinute, int authPerIpPerMinute, int loginPerEmailPer15minutes, int joinPerIpPerMinute) {}
 
-    public record Ai(String apiKey, String baseUrl, String model, String visionModel, int timeoutSeconds, int callsPerHour, int callsPerDay) {
+    public record Ai(String apiKey, String baseUrl, String chatPath, String model, String visionModel, int timeoutSeconds, int callsPerHour, int callsPerDay) {
         public boolean enabled() {
             return apiKey != null && !apiKey.isBlank();
         }

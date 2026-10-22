@@ -25,7 +25,7 @@ services:
       PACTOLE_SECURITY_JWT_SECRET: ${JWT_SECRET}
       PACTOLE_SECURITY_REFRESH_COOKIE_SECURE: "true"
       PACTOLE_CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost}
-      PACTOLE_AI_API_KEY: ${MISTRAL_API_KEY}
+      PACTOLE_AI_API_KEY: ${AI_API_KEY}
     depends_on:
       postgres:
         condition: service_healthy

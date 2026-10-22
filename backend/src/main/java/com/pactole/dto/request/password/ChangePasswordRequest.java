@@ -12,11 +12,10 @@ import lombok.Setter;
 public class ChangePasswordRequest {
 
     @NotBlank
-    @Size(max = 12)
     String currentPassword;
 
-    @NotBlank 
-    @Size(max = 12)
+    @NotBlank
+    @Size(min = 12, message = "{validation.password.size}")
     String newPassword;
     
     @Override

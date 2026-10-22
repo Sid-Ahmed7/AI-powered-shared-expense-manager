@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 import com.pactole.config.PactoleProperties;
 
 @Component
-public class MistralHttpClientBuilder {
+public class AiHttpClientBuilder {
 
     public RestClient build(PactoleProperties.Ai config, RestClient.Builder builder) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();

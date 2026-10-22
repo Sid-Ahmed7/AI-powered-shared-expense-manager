@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.pactole.ai.MistralClient;
+import com.pactole.ai.AiClient;
 import com.pactole.common.CurrentUser;
 import com.pactole.constants.CommonConstants;
 import com.pactole.dto.request.ai.AskRequest;
@@ -30,6 +30,7 @@ import com.pactole.dto.response.ai.ExpenseDraft;
 import com.pactole.dto.response.ai.Recap;
 import com.pactole.dto.response.ai.ReceiptDraft;
 import com.pactole.dto.response.ai.ReminderResponse;
+import com.pactole.common.Messages;
 import com.pactole.exceptions.Errors;
 import com.pactole.security.AiRateLimiter;
 import com.pactole.security.ImageSignature;
@@ -45,15 +46,16 @@ import jakarta.validation.Valid;
 @RequestMapping("/api")
 public class AiController {
 
-    private final MistralClient clientAi;
+    private final AiClient clientAi;
     private final AiRateLimiter rateLimiter;
     private final GroupAccess groupAccess;
     private final AiFeatures expenseFeatures;
     private final GroupAssistant assistant;
     private final AiWriter writer;
     private final StatsService statsService;
+    private final Messages messages;
 
-    public AiController(MistralClient clientAi, AiRateLimiter rateLimiter, GroupAccess groupAccess, AiFeatures expenseFeatures, GroupAssistant assistant, AiWriter writer, StatsService statsService) {
+    public AiController(AiClient clientAi, AiRateLimiter rateLimiter, GroupAccess groupAccess, AiFeatures expenseFeatures, GroupAssistant assistant, AiWriter writer, StatsService statsService, Messages messages) {
         this.clientAi = clientAi;
         this.rateLimiter = rateLimiter;
         this.groupAccess = groupAccess;
@@ -61,6 +63,7 @@ public class AiController {
         this.assistant = assistant;
         this.writer = writer;
         this.statsService = statsService;
+        this.messages = messages;
     }
 
     public record RecapResponse(MonthComparison stats, Recap recap, String aiError) {}
@@ -116,8 +119,10 @@ public class AiController {
         try {
             rateLimiter.acquire(userId);
             return new RecapResponse(data, writer.recap(ctx, data), null);
-        } catch (Errors.AiUnavailable | Errors.TooManyRequests e) {
-            return new RecapResponse(data, null, e.getMessage()); 
+        } catch (Errors.AiUnavailable e) {
+            return new RecapResponse(data, null, messages.get(e.getMessageKey(), e.getArgs()));
+        } catch (Errors.TooManyRequests e) {
+            return new RecapResponse(data, null, messages.get(e.getMessageKey(), e.getArgs())); 
         }
     }
 

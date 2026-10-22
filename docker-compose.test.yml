@@ -1,0 +1,14 @@
+services:
+  backend-test:
+    build:
+      context: ./backend
+      target: test
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+
+  frontend-test:
+    build:
+      context: ./frontend
+      target: test

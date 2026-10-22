@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pactole.ai.MistralClient;
+import com.pactole.ai.AiClient;
 import com.pactole.common.AICommon;
 import com.pactole.common.Messages;
-import com.pactole.mapping.MistralResponseMapper;
+import com.pactole.mapping.AiResponseMapper;
 import com.pactole.common.TextMatching;
 import com.pactole.constants.CommonConstants;
 import com.pactole.dto.request.expense.SplitValueRequest;
@@ -38,12 +38,12 @@ import com.pactole.services.expensesGroup.IGroupAccess;
 @Service
 public class AiFeatures implements IAiFeatures {
 
-    private final MistralClient clientAI;
+    private final AiClient clientAI;
     private final ObjectMapper mapper;
-    private final MistralResponseMapper responseMapper;
+    private final AiResponseMapper responseMapper;
     private final Messages messages;
 
-    public AiFeatures(MistralClient clientAI, ObjectMapper mapper, MistralResponseMapper responseMapper, Messages messages) {
+    public AiFeatures(AiClient clientAI, ObjectMapper mapper, AiResponseMapper responseMapper, Messages messages) {
         this.clientAI = clientAI;
         this.mapper = mapper;
         this.responseMapper = responseMapper;
