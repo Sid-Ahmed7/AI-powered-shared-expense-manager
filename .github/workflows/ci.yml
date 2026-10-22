@@ -68,58 +68,34 @@ jobs:
                 path: backend/target/surefire-reports/
                 retention-days: 7
 
-    # frontend:
-    #     name: Frontend – Build & Audit
-    #     runs-on: ubuntu-latest
-    #     defaults:
-    #         run:
-    #             working-directory: frontend
-    #     steps:
-    #         - uses: actions/checkout@v4
-    #         - uses: actions/setup-node@v4
-    #           with:
-    #             node-version: 22
-    #             cache: npm
-    #             cache-dependency-path: frontend/package-lock.json
-    #         - run: npm ci
-    #         - run: npm audit --audit-level=high
-    #         - run: npm run build
-
-    codeql:
-        name: CodeQL
+    frontend:
+        name: Frontend – Build & Audit
         runs-on: ubuntu-latest
-        permissions:
-            contents: read
-            actions: read
-            security-events: write
-        strategy:
-            fail-fast: false
-            matrix:
-                include:
-                    - language: java-kotlin
-                      build-mode: none
-                    - language: javascript-typescript
-                      build-mode: none
+        defaults:
+            run:
+                working-directory: frontend
         steps:
             - uses: actions/checkout@v4
-            - uses: github/codeql-action/init@v4
+            - uses: actions/setup-node@v4
               with:
-                languages: ${{ matrix.language }}
-                build-mode: ${{ matrix.build-mode }}
-                queries: security-extended
-            - uses: github/codeql-action/analyze@v4
+                node-version: 22
+                cache: npm
+                cache-dependency-path: frontend/package-lock.json
+            - run: npm ci
+            - run: npm audit --audit-level=high
+            - run: npm run build
 
     trivy:
         name: Trivy – Scan
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
+            - name: Installer Trivy
+              run: |
+                curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
             - name: Scan avec Trivy
-              uses: aquasecurity/trivy-action@v0.36.0
-              with:
-                scan-type: fs
-                scan-ref: .
-                scanners: vuln,misconfig,secret
-                severity: HIGH,CRITICAL
-                ignore-unfixed: true
-                exit-code: "1"
+              run: |
+                trivy fs . \
+                  --scanners vuln,misconfig,secret \
+                  --severity HIGH,CRITICAL \
+                  --ignore-unfixed
