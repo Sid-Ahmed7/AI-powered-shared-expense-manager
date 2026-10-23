@@ -65,7 +65,8 @@ public class ExpenseGroupController {
                     IGroupAccess.Context ctx = access.context(g.getId(), userId);
                     long expenseCount = expenseRepository.countByGroupId(g.getId());
                     long myBalance = balanceService.netOf(ctx, ctx.me());
-                    return new GroupSummary(g.getId(), g.getName(), g.getCurrency(), ctx.members().size(), expenseCount, myBalance);
+                    long totalSpent = expenseRepository.totalSpentByGroup(g.getId());
+                    return new GroupSummary(g.getId(), g.getName(), g.getCurrency(), ctx.members().size(), expenseCount, myBalance, totalSpent);
                 }).toList();
     }
 

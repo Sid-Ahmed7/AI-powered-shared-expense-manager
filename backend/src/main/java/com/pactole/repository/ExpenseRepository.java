@@ -21,6 +21,9 @@ public interface ExpenseRepository extends JpaRepository<Expense, UUID>, JpaSpec
 
     List<Expense> findByGroupIdAndCreatedByOrderByDateDesc(UUID groupId, UUID createdBy);
 
+    @Query("SELECT COALESCE(SUM(e.amountCents), 0) FROM Expense e WHERE e.groupId = :groupId")
+    long totalSpentByGroup(UUID groupId);
+
     @Query("SELECT e.payerMemberId AS memberId, SUM(e.amountCents) AS cents FROM Expense e WHERE e.groupId = :groupId GROUP BY e.payerMemberId")
     List<MemberAmount> paidByMember(UUID groupId);
 

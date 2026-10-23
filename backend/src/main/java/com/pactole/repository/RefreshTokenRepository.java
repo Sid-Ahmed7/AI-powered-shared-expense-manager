@@ -24,6 +24,9 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID
     @Query("SELECT t FROM RefreshToken t WHERE t.userId = :userId and t.revokedAt is null and t.expiresAt > :now order by t.createdAt desc")
     List<RefreshToken> findActiveByUser(UUID userId, Instant now);
 
+    @Query("SELECT t FROM RefreshToken t WHERE t.userId = :userId AND t.familyStartedAt > :since ORDER BY t.familyStartedAt DESC")
+    List<RefreshToken> findRecentByUser(UUID userId, Instant since);
+
     @Modifying
     @Query("DELETE FROM RefreshToken t WHERE t.expiresAt < :before")
     int deleteExpiredBefore(Instant before);

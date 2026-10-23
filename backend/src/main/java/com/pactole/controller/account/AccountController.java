@@ -1,9 +1,14 @@
 package com.pactole.controller.account;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -11,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,13 +27,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pactole.common.ClientInfo;
 import com.pactole.common.CurrentUser;
+import com.pactole.entities.Account;
 import com.pactole.entities.Expense;
 import com.pactole.entities.Member;
+import com.pactole.entities.RefreshToken;
 import com.pactole.dto.request.account.DeleteAccountRequest;
 import com.pactole.dto.request.password.ChangePasswordRequest;
+import com.pactole.repository.AccountRepository;
 import com.pactole.repository.ExpenseGroupRepository;
 import com.pactole.repository.ExpenseRepository;
 import com.pactole.repository.MemberRepository;
+import com.pactole.repository.RefreshTokenRepository;
 import com.pactole.security.RefreshCookies;
 import com.pactole.services.account.AccountService;
 import com.pactole.services.refreshToken.ISessionService;
@@ -47,9 +57,12 @@ public class AccountController {
     private final ExpenseGroupRepository groups;
     private final MemberRepository members;
     private final ExpenseRepository expenses;
+    private final AccountRepository accounts;
+    private final RefreshTokenRepository tokens;
 
     public AccountController(AccountService accountService, SessionService sessionService, RefreshCookies refreshCookies,
-                             CurrentUser currentUser, ExpenseGroupRepository groups, MemberRepository members, ExpenseRepository expenses) {
+                             CurrentUser currentUser, ExpenseGroupRepository groups, MemberRepository members,
+                             ExpenseRepository expenses, AccountRepository accounts, RefreshTokenRepository tokens) {
         this.accountService = accountService;
         this.sessionService = sessionService;
         this.refreshCookies = refreshCookies;
@@ -57,6 +70,8 @@ public class AccountController {
         this.groups = groups;
         this.members = members;
         this.expenses = expenses;
+        this.accounts = accounts;
+        this.tokens = tokens;
     }
 
     @GetMapping("/sessions")
@@ -88,8 +103,45 @@ public class AccountController {
     }
 
     @GetMapping("/security-events")
-    public List<Object> securityEvents(@AuthenticationPrincipal Jwt jwt) {
-        return List.of();
+    @Transactional(readOnly = true)
+    public List<ISessionService.SecurityEvent> securityEvents(@AuthenticationPrincipal Jwt jwt) {
+        UUID userId = CurrentUser.id(jwt);
+        Account account = accounts.findById(userId).orElseThrow();
+        Instant since = Instant.now().minus(90, ChronoUnit.DAYS);
+
+        List<RefreshToken> recent = tokens.findRecentByUser(userId, since);
+
+        List<ISessionService.SecurityEvent> events = new ArrayList<>();
+
+        // Account creation
+        events.add(new ISessionService.SecurityEvent("REGISTER", account.getCreatedAt(), null));
+
+        // One LOGIN_SUCCESS per session family + revocation events
+        Set<UUID> seenFamilies = new HashSet<>();
+        for (RefreshToken token : recent) {
+            if (seenFamilies.add(token.getFamilyId())) {
+                events.add(new ISessionService.SecurityEvent("LOGIN_SUCCESS", token.getFamilyStartedAt(), token.getUserAgent()));
+            }
+            if (token.getRevokedAt() != null && token.getRevokeReason() != null) {
+                String type = switch (token.getRevokeReason()) {
+                    case "LOGOUT"           -> "LOGOUT";
+                    case "LOGOUT_ALL"       -> "LOGOUT_ALL";
+                    case "REUSE_DETECTED"   -> "REFRESH_REUSE_DETECTED";
+                    case "PASSWORD_CHANGED" -> "PASSWORD_CHANGED";
+                    case "SESSION_REVOKED"  -> "SESSION_REVOKED";
+                    case "ACCOUNT_DELETED"  -> null;
+                    default                 -> null;
+                };
+                if (type != null && seenFamilies.contains(token.getFamilyId())) {
+                    events.add(new ISessionService.SecurityEvent(type, token.getRevokedAt(), token.getUserAgent()));
+                }
+            }
+        }
+
+        return events.stream()
+                .sorted(Comparator.comparing(ISessionService.SecurityEvent::date).reversed())
+                .limit(30)
+                .toList();
     }
 
     @GetMapping(value = "/export", produces = MediaType.APPLICATION_JSON_VALUE)

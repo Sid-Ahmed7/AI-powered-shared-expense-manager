@@ -5,7 +5,6 @@ import com.pactole.common.ClientInfo;
 import com.pactole.common.HashToken;
 import com.pactole.config.PactoleProperties;
 import com.pactole.dto.request.session.SessionRequest;
-import com.pactole.dto.request.session.SessionViewRequest;
 import com.pactole.entities.RefreshToken;
 import com.pactole.enums.RefreshReason;
 import com.pactole.exceptions.Errors;
@@ -113,9 +112,13 @@ public class SessionService implements ISessionService {
     @Transactional(readOnly = true)
     public List<SessionView> list(UUID userId, UUID currentSessionId) {
         return tokens.findActiveByUser(userId, Instant.now()).stream()
-                .map(token -> new SessionView(new SessionViewRequest(
-                        token.getFamilyId(), token.getFamilyStartedAt(), token.getCreatedAt(),
-                        token.getUserAgent(), maskIp(token.getIp()), token.getFamilyId().equals(currentSessionId))))
+                .map(token -> new SessionView(
+                        token.getFamilyId(),
+                        token.getFamilyStartedAt(),
+                        token.getCreatedAt(),
+                        token.getUserAgent(),
+                        maskIp(token.getIp()),
+                        token.getFamilyId().equals(currentSessionId)))
                 .toList();
     }
 

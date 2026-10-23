@@ -87,7 +87,7 @@ public class AiClient implements IAiClient {
 
         long start = System.nanoTime();
         try {
-            String raw = http.post()
+            byte[] rawBytes = http.post()
                 .uri(aiConfiguration.chatPath())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(body)
@@ -101,7 +101,8 @@ public class AiClient implements IAiClient {
                     if (status == 503) throw new ServiceOverloadedException();
                     throw new Errors.AiUnavailable("ai.client.error.status", status);
                 })
-                .body(String.class);
+                .body(byte[].class);
+            String raw = rawBytes != null ? new String(rawBytes, java.nio.charset.StandardCharsets.UTF_8) : "";
             JsonNode response = objectMapper.readTree(raw);
             JsonNode usage = response.path("usage");
             log.info("AI{} : {} ms, {} jetons en entrée, {} en sortie", model, (System.nanoTime() - start) / 1_000_000, usage.path("prompt_tokens").asInt(), usage.path("completion_tokens").asInt());
