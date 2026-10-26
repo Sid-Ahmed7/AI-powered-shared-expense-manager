@@ -34,5 +34,8 @@ public final class CommonConstants {
     public static final Set<String> IMAGE_TYPES = Set.of("image/jpeg", "image/png", "image/webp");
     public static final Integer MAX_STEPS = 5;
     public static final ZoneId ZONE = ZoneId.of("Europe/Paris");
+    public static final String ENCODING = "UTF-8";
+    public static final Integer TTL_HOURS = 1;
+
 
 }

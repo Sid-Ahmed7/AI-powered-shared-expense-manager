@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pactole.common.ClientInfo;
 import com.pactole.common.CurrentUser;
 import com.pactole.dto.request.login.LoginRequest;
+import com.pactole.dto.request.password.ForgotPasswordRequest;
+import com.pactole.dto.request.password.ResetPasswordRequest;
 import com.pactole.dto.request.register.RegisterRequest;
+import com.pactole.services.passwordReset.PasswordResetService;
 import com.pactole.dto.response.account.AccountResponse;
 import com.pactole.dto.response.auth.AuthResponse;
 import com.pactole.dto.response.token.AccessTokenResponse;
@@ -43,12 +46,14 @@ public class AuthController {
     private final SessionService sessionService;
     private final AccessTokenResponseService accessTokenResponseService;
     private final RefreshCookies refreshCookies;
+    private final PasswordResetService passwordResetService;
 
-    public AuthController(AuthService authService, SessionService sessionService, AccessTokenResponseService accessTokenResponseService, RefreshCookies refreshCookies) {
+    public AuthController(AuthService authService, SessionService sessionService, AccessTokenResponseService accessTokenResponseService, RefreshCookies refreshCookies, PasswordResetService passwordResetService) {
         this.authService = authService;
         this.sessionService = sessionService;
         this.accessTokenResponseService = accessTokenResponseService;
         this.refreshCookies = refreshCookies;
+        this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/register")
@@ -79,6 +84,18 @@ public class AuthController {
     public ResponseEntity<Void> logout(@CookieValue(name = "${pactole.security.refresh.cookie-name}", required = false) String token, HttpServletRequest http) {
         sessionService.logout(token);
         return ResponseEntity.noContent().header(HttpHeaders.SET_COOKIE, refreshCookies.clear()).build();
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        passwordResetService.requestReset(request.getEmail());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me")

@@ -29,7 +29,7 @@ jobs:
               run: mvn clean compile -DskipTests -B
 
             - name: Tests unitaires
-              run: mvn test -B -Dtest="com.pactole.common.**,com.pactole.security.**" -DfailIfNoTests=false
+              run: mvn test -B -Dtest="com.pactole.common.**,com.pactole.security.**,com.pactole.services.**" -DfailIfNoTests=false
 
             - name: Tests d'intégration
               run: mvn test -B -Dtest="com.pactole.controller.**,com.pactole.PactoleApplicationTests" -DfailIfNoTests=false
@@ -51,6 +51,9 @@ jobs:
                 PACTOLE_SECURITY_RATE_LIMITS_AUTH_PER_IP_PER_MINUTE: ${{ secrets.TEST_RATE_AUTH_PER_IP }}
                 PACTOLE_SECURITY_RATE_LIMITS_LOGIN_PER_EMAIL_PER15MINUTES: ${{ secrets.TEST_RATE_LOGIN_PER_EMAIL }}
                 PACTOLE_SECURITY_RATE_LIMITS_JOIN_PER_IP_PER_MINUTE: ${{ secrets.TEST_RATE_JOIN_PER_IP }}
+                PACTOLE_APP_URL: ${{ secrets.TEST_APP_URL }}
+                SPRING_MAIL_USERNAME: ${{ secrets.TEST_MAIL_USERNAME }}
+                SPRING_MAIL_PASSWORD: ${{ secrets.TEST_MAIL_PASSWORD }}
                 PACTOLE_CORS_ORIGINS: ${{ secrets.TEST_CORS_ORIGINS }}
                 PACTOLE_AI_BASE_URL: ${{ secrets.TEST_AI_BASE_URL }}
                 PACTOLE_AI_CHAT_PATH: ${{ secrets.TEST_AI_CHAT_PATH }}

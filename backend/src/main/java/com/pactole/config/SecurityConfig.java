@@ -3,6 +3,7 @@ package com.pactole.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import com.pactole.common.CurrentLocale;
+import com.pactole.constants.CommonConstants;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -74,7 +75,7 @@ public class SecurityConfig {
                 .logout(lg -> lg.disable())
                 .requestCache(cache -> cache.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/auth/refresh", "/api/auth/logout").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/auth/register", "/api/auth/login", "/api/auth/refresh", "/api/auth/logout", "/api/auth/forgot-password", "/api/auth/reset-password").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/meta/**").permitAll()
                         .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                         .requestMatchers("/error").permitAll()
@@ -84,7 +85,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint((request, response, ex) -> {
                             response.setStatus(401);
                             response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
-                            response.setCharacterEncoding("UTF-8");
+                            response.setCharacterEncoding(CommonConstants.ENCODING);
                             ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.UNAUTHORIZED);
                             pd.setTitle(messages.getMessage("auth.unauthorized", null, CurrentLocale.getCurrentLocale()));
                             pd.setDetail(messages.getMessage("auth.token.invalid", null, CurrentLocale.getCurrentLocale()));
@@ -93,7 +94,7 @@ public class SecurityConfig {
                         .accessDeniedHandler((request, response, ex) -> {
                             response.setStatus(403);
                             response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
-                            response.setCharacterEncoding("UTF-8");
+                            response.setCharacterEncoding(CommonConstants.ENCODING);
                             ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.FORBIDDEN);
                             pd.setTitle(messages.getMessage("auth.access.denied", null, CurrentLocale.getCurrentLocale()));
                             pd.setDetail(messages.getMessage("auth.access.denied.detail", null, CurrentLocale.getCurrentLocale()));

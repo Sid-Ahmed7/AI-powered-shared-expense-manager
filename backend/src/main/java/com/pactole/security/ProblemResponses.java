@@ -1,6 +1,8 @@
 package com.pactole.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pactole.constants.CommonConstants;
+
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -23,7 +25,7 @@ public class ProblemResponses {
         }
         response.setStatus(status);
         response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding(CommonConstants.ENCODING);
         ProblemDetail problemDetail = ProblemDetail.forStatus(status);
         problemDetail.setDetail(detail);
         objectMapper.writeValue(response.getWriter(), problemDetail);
