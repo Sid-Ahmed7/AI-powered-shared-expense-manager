@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@theme {
+  --bg: #0A0908;
+  --surface: #131110;
+  --surface-2: #1A1714;
+  --card: #1A1714;
+  --border: #2C2722;
+  --border-focus: #F97316;
+  --text: #F5F0EB;
+  --text-2: #C4BAB2;
+  --muted: #7A7068;
+  --primary: #F97316;
+  --primary-dim: rgba(249,115,22,0.10);
+  --primary-soft: #3D2010;
+  --primary-glow: rgba(249,115,22,0.30);
+  --accent: #FBBF24;
+  --accent-soft:  #372B0B;
+  --pos: #4ADE80;
+  --pos-soft: rgba(74,222,128,0.12);
+  --neg: #F87171;
+  --neg-soft: rgba(248,113,113,0.12);
+
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-lg: 20px;
+
+  --shadow: 0 1px 2px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.35);
+  --glow: 0 0 28px rgba(249,115,22,0.28);
+  --transition: 0.14s ease;
+
+  --animate-shimmer: shimmer 1.5s linear infinite;
+  --animate-slide-up: slide-up 0.22s cubic-bezier(0.34,1.2,0.64,1);
+}
+
+:root {
+  color-scheme: dark;
+  --select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237A7068' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  --select-arrow-focus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23F97316' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+html[data-theme="light"] {
+  --bg: #FAF8F5;
+  --surface: #FFFFFF;
+  --surface-2: #F2EDE7;
+  --card: #FFFFFF;
+  --border: #E5DDD5;
+  --text: #1A1208;
+  --text-2: #4A3F35;
+  --muted: #8C7B6E;
+  --primary-soft: #FDE8D8;
+  --accent-soft:  #FEF3C7;
+  --shadow: 0 1px 2px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08);
+  --glow: 0 0 28px rgba(249,115,22,0.18);
+  color-scheme: light;
+}
+
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 15px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: rgba(249,115,22,0.25);
+    color: var(--text);
+  }
+
+  h1, h2, h3 { margin: 0; }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    color: var(--text);
+  }
+  h2 {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  h3 {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  h3::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  p { margin: 0; }
+  a { color: var(--primary); text-decoration: none; transition: opacity var(--transition); }
+  a:hover { opacity: 0.8; }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.6) sepia(1) hue-rotate(340deg) saturate(2);
+    cursor: pointer;
+  }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+@keyframes slide-up {
+  from { transform: translateY(40px); opacity: 0; }
+}
