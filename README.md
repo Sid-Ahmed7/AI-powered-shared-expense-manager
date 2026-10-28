@@ -6,7 +6,7 @@
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.x-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
@@ -31,7 +31,7 @@
 - [Production](#-production)
 - [Database](#-database)
 - [Security](#-security)
-- [AI / Gemini integration](#-ai--gemini-integration)
+- [AI integration](#-ai-integration)
 - [Tests](#-tests)
 - [CI/CD](#-cicd)
 - [Project structure](#-project-structure)
@@ -46,11 +46,11 @@
 |---|---|---|
 | Language | Java | 25 |
 | Framework | Spring Boot | 4.x |
-| Database | PostgreSQL | 16 |
+| Database | PostgreSQL | 16+ |
 | Migrations | Flyway | — |
 | Security | Spring Security + JWT | — |
 | Email | Spring Mail (Gmail SMTP) | — |
-| AI | Google Gemini API | gemini-2.0-flash |
+| AI | Google Gemini API | gemini-3.8-flash |
 | Tests | JUnit 5 + Mockito + Testcontainers | — |
 | Build | Maven (mvnw wrapper) | — |
 
@@ -67,7 +67,6 @@
 | Internationalization | i18next + react-i18next | FR / EN |
 | Icons | Lucide React | — |
 | Mobile (native) | Capacitor | — |
-| HTTP client | Custom `api.ts` wrapper (fetch) | — |
 
 ### Infrastructure
 
@@ -76,7 +75,7 @@
 | Containers | Docker + Docker Compose |
 | Reverse proxy (prod) | Nginx (inside the frontend container) |
 | CI/CD | GitHub Actions |
-| Security scan | Trivy (Docker image vulnerabilities) |
+| Security scan | Trivy (filesystem: vulns, misconfigs, secrets) |
 
 ---
 
@@ -92,20 +91,19 @@ POSTGRES_DB=pactole
 POSTGRES_USER=pactole
 POSTGRES_PASSWORD=change_me_strong_password
 
-# ── JWT (generate with: openssl rand -base64 64) ─────────
-JWT_SECRET=your_64_byte_base64_access_secret
-JWT_REFRESH_SECRET=your_64_byte_base64_refresh_secret
+# ── JWT (generate with: openssl rand -base64 32) ─────────
+PACTOLE_SECURITY_JWT_SECRET=your_base64_secret
 
 # ── Google Gemini ─────────────────────────────────────────
-GEMINI_API_KEY=your_gemini_api_key
+PACTOLE_AI_API_KEY=your_gemini_api_key
 
 # ── Email (Gmail SMTP with App Password) ──────────────────
-MAIL_USERNAME=your_gmail_address@gmail.com
-MAIL_PASSWORD=your_16_char_app_password
+SPRING_MAIL_USERNAME=your_gmail_address@gmail.com
+SPRING_MAIL_PASSWORD=your_16_char_app_password
 
 # ── CORS / URLs ───────────────────────────────────────────
-FRONTEND_URL=https://yourdomain.com
-APP_BASE_URL=https://yourdomain.com
+PACTOLE_CORS_ORIGINS=https://yourdomain.com
+PACTOLE_APP_URL=https://yourdomain.com
 ```
 
 > ⚠️ **Never commit this file.** It is listed in `.gitignore`.
@@ -120,35 +118,25 @@ This file is **gitignored**. Copy `application-dev.properties.example` and fill 
 # ── DataSource ────────────────────────────────────────────
 spring.datasource.url=jdbc:postgresql://localhost:5432/pactole
 spring.datasource.username=pactole
-spring.datasource.password=change_me_strong_password
+spring.datasource.password=change_me
 
-# ── JWT ───────────────────────────────────────────────────
-app.jwt.secret=your_64_byte_base64_access_secret
-app.jwt.refresh-secret=your_64_byte_base64_refresh_secret
-app.jwt.expiration-ms=600000
-app.jwt.refresh-expiration-ms=2592000000
-app.jwt.refresh-expiration-remember-ms=7776000000
+# ── JWT (generate with: openssl rand -base64 32) ─────────
+pactole.security.jwt.secret=your_base64_secret
 
-# ── Gemini AI ─────────────────────────────────────────────
-app.gemini.api-key=your_gemini_api_key
-app.gemini.enabled=true
+# ── CORS ──────────────────────────────────────────────────
+pactole.cors-origins=http://localhost:5173,http://localhost:3000
 
-# ── Email ─────────────────────────────────────────────────
-spring.mail.host=smtp.gmail.com
-spring.mail.port=587
-spring.mail.username=your_gmail_address@gmail.com
-spring.mail.password=your_16_char_app_password
-spring.mail.properties.mail.smtp.auth=true
-spring.mail.properties.mail.smtp.starttls.enable=true
+# ── App URL (used in password reset emails) ───────────────
+pactole.app-url=http://localhost:5173
 
-# ── URLs ──────────────────────────────────────────────────
-app.base-url=http://localhost:5173
-app.frontend-url=http://localhost:5173
+# ── Google AI Studio : https://aistudio.google.com/app/apikey
+pactole.ai.api-key=CHANGE_ME
 
-# ── Rate limiting (per IP, per minute) ───────────────────
-app.rate-limit.login=10
-app.rate-limit.register=5
-app.rate-limit.password-reset=3
+# ── Gmail SMTP ────────────────────────────────────────────
+# Use a Gmail App Password, NOT your account password.
+# Enable: Google Account → Security → 2-Step Verification → App passwords
+spring.mail.username=your.address@gmail.com
+spring.mail.password=abcd efgh ijkl mnop
 ```
 
 > 💡 **How to get a Gmail App Password:** Google Account → Security → 2-Step Verification → App passwords. Generate one for "Mail". Use the 16-character code (no spaces).
@@ -210,7 +198,7 @@ docker compose up --build -d
 ```
 
 The `docker-compose.yml` at the project root orchestrates three services:
-- `db` — PostgreSQL 16
+- `db` — PostgreSQL
 - `backend` — Spring Boot JAR
 - `frontend` — Nginx serving the Vite build + reverse-proxying `/api` to the backend
 
@@ -224,7 +212,7 @@ Migrations live in `backend/src/main/resources/db/migration/` and run automatica
 
 | File | Description |
 |---|---|
-| `V1__init.sql` | Initial schema: users, groups, members, expenses, refresh_tokens |
+| `V1__security_sessions.sql` | Initial schema: accounts, groups, members, expenses, refresh tokens |
 | `V2__password_reset.sql` | Adds the `password_reset_tokens` table |
 
 ---
@@ -234,20 +222,22 @@ Migrations live in `backend/src/main/resources/db/migration/` and run automatica
 | Feature | Detail |
 |---|---|
 | Access token | JWT, 10 min expiry, signed with HS512 |
-| Refresh token | Stored in DB (hashed), 30 days standard / 90 days "remember me" |
+| Refresh token | Stored in DB (hashed), sliding 30-day / absolute 90-day window |
 | Refresh token rotation | Old token invalidated on every refresh |
-| Password reset | Time-limited single-use UUID token, emailed link, expires in 1 hour |
-| Rate limiting | Per-IP limits on login, register, and password-reset endpoints |
+| Password reset | Time-limited single-use token, emailed link |
+| Rate limiting | Per-IP limits on global, auth, login, and join endpoints |
 | Account lockout | After repeated failed login attempts |
-| CORS | Restricted to `FRONTEND_URL` |
+| Input sanitisation | All user-supplied strings are sanitised before use |
+| Prompt guard | AI endpoints reject inputs that attempt prompt injection |
+| CORS | Restricted to `pactole.cors-origins` |
 | CSRF | Disabled (stateless JWT API) |
 | Passwords | BCrypt |
 
 ---
 
-## 🤖 AI / Gemini integration
+## 🤖 AI integration
 
-The `app.gemini.enabled` flag controls all AI features. When `false`, the frontend hides the assistant tab and disables AI buttons gracefully.
+Fendly uses the Google Gemini API, configurable via `pactole.ai.*` properties. AI endpoints are rate-limited independently (`pactole.ai.calls-per-hour`, `pactole.ai.calls-per-day`).
 
 | Feature | Endpoint | Description |
 |---|---|---|
@@ -263,11 +253,11 @@ The `app.gemini.enabled` flag controls all AI features. When `false`, the fronte
 ```bash
 cd backend
 
-# Unit tests only (no Docker required)
-./mvnw test -Dgroups="unit"
+# Unit tests (no Docker required)
+./mvnw test -B -Dtest="com.pactole.common.**,com.pactole.security.**,com.pactole.services.**"
 
 # Integration tests (requires Docker for Testcontainers)
-./mvnw test -Dgroups="integration"
+./mvnw test -B -Dtest="com.pactole.controller.**,com.pactole.PactoleApplicationTests"
 
 # All tests
 ./mvnw test
@@ -279,11 +269,13 @@ Integration tests use **Testcontainers** to spin up a real PostgreSQL instance, 
 
 ## ⚙️ CI/CD
 
-GitHub Actions runs on every push and pull request to `main`:
+GitHub Actions runs on every push and pull request (`**` branches):
 
-1. **Build & test** — compiles the backend with Maven and runs all tests
-2. **Frontend lint/build** — `npm ci && npm run build`
-3. **Trivy scan** — scans the Docker image for known CVEs and fails on HIGH/CRITICAL vulnerabilities
+| Job | What it does |
+|---|---|
+| **Backend – Build & Test** | Compiles with Maven, runs unit tests then integration tests (Testcontainers + PostgreSQL) |
+| **Frontend – Build & Audit** | `npm ci` + `npm audit --audit-level=high` + `vite build` |
+| **Trivy – Scan** | Scans the full filesystem for vulnerabilities, misconfigurations, and leaked secrets (HIGH/CRITICAL, ignore-unfixed) |
 
 Workflow file: [.github/workflows/ci.yml](.github/workflows/ci.yml)
 
@@ -298,24 +290,28 @@ fendly/
 │
 ├── backend/
 │   ├── src/main/java/com/pactole/
+│   │   ├── common/                # Utilities: SplitCalculator, SettlementCalculator, InputSanitizer…
 │   │   ├── config/                # Spring Security, CORS, rate limiting config
 │   │   ├── constants/             # Shared constants
-│   │   ├── controller/            # REST controllers (auth, groups, expenses, AI…)
+│   │   ├── controller/            # REST controllers (auth, groups, expenses, AI, settlement…)
 │   │   ├── dto/                   # Request / response DTOs
 │   │   ├── entities/              # JPA entities
-│   │   ├── enums/                 # Domain enums (Category, Tone, RefreshReason…)
+│   │   ├── exceptions/            # Error types and global exception handler
 │   │   ├── repository/            # Spring Data JPA repositories
-│   │   ├── security/              # JWT filter, problem responses
-│   │   └── services/              # Business logic (expense, balance, AI, email…)
-│   └── src/main/resources/
-│       ├── db/migration/          # Flyway SQL migrations
-│       ├── messages*.properties   # i18n error messages
-│       └── application*.properties
+│   │   ├── security/              # JWT filter, rate limiter, prompt guard, password policy
+│   │   └── services/              # Business logic (expense, balance, AI, email, password reset…)
+│   ├── src/main/resources/
+│   │   ├── db/migration/          # Flyway SQL migrations
+│   │   ├── messages*.properties   # i18n error & email messages
+│   │   └── application*.properties
+│   └── src/test/
+│       ├── java/                  # Unit tests (services, security, common) + integration tests (controllers)
+│       └── resources/
+│           └── application-test.properties
 │
 └── frontend/
     ├── src/
-    │   ├── api.ts                 # Typed API client
-    │   ├── auth.tsx               # Auth context + hooks
+    │   ├── api/                   # Typed API client
     │   ├── components/
     │   │   ├── form/              # ExpenseForm, AddMemberForm, AiTextForm
     │   │   └── ui/                # Button, Chip, Modal, Sidebar, FieldGroup…
@@ -323,6 +319,7 @@ fendly/
     │   ├── i18n/                  # Translation files (fr, en)
     │   ├── pages/                 # GroupsPage, GroupPage, AccountPage, JoinPage…
     │   ├── schemas/               # Zod schemas shared between forms
-    │   └── types/                 # TypeScript types
+    │   ├── types/                 # TypeScript types
+    │   └── utils/                 # money, date helpers
     └── nginx.conf                 # Production Nginx config
 ```
