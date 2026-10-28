@@ -28,11 +28,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PasswordResetServiceTest {
 
-    @Mock AccountRepository          accountRepository;
+    @Mock AccountRepository accountRepository;
     @Mock PasswordResetTokenRepository tokenRepository;
-    @Mock PasswordService            passwordService;
-    @Mock SessionService             sessionService;
-    @Mock EmailService               emailService;
+    @Mock PasswordService passwordService;
+    @Mock SessionService sessionService;
+    @Mock EmailService emailService;
 
     PasswordResetService service;
 
@@ -44,7 +44,6 @@ class PasswordResetServiceTest {
         );
     }
 
-    // ── requestReset ──────────────────────────────────────────────────────────
 
     @Test
     void requestReset_unknownEmail_silentlyIgnored() {
@@ -100,25 +99,21 @@ class PasswordResetServiceTest {
         assertThat(linkCaptor.getValue()).startsWith("http://localhost:5173/reset-password?token=");
     }
 
-    // ── resetPassword ─────────────────────────────────────────────────────────
 
     @Test
     void resetPassword_invalidToken_throwsValidation() {
         when(tokenRepository.findByTokenHash(any())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.resetPassword("bad-token", "NewPassword1234!"))
-            .isInstanceOf(Errors.Validation.class);
+        assertThatThrownBy(() -> service.resetPassword("bad-token", "NewPassword1234!")).isInstanceOf(Errors.Validation.class);
     }
 
     @Test
     void resetPassword_expiredToken_throwsValidation() {
         PasswordResetToken expired = mock(PasswordResetToken.class);
         when(expired.isExpired()).thenReturn(true);
-        when(expired.isUsed()).thenReturn(false);
         when(tokenRepository.findByTokenHash(any())).thenReturn(Optional.of(expired));
 
-        assertThatThrownBy(() -> service.resetPassword("expired-token", "NewPassword1234!"))
-            .isInstanceOf(Errors.Validation.class);
+        assertThatThrownBy(() -> service.resetPassword("expired-token", "NewPassword1234!")).isInstanceOf(Errors.Validation.class);
     }
 
     @Test
@@ -128,8 +123,7 @@ class PasswordResetServiceTest {
         when(used.isUsed()).thenReturn(true);
         when(tokenRepository.findByTokenHash(any())).thenReturn(Optional.of(used));
 
-        assertThatThrownBy(() -> service.resetPassword("used-token", "NewPassword1234!"))
-            .isInstanceOf(Errors.Validation.class);
+        assertThatThrownBy(() -> service.resetPassword("used-token", "NewPassword1234!")).isInstanceOf(Errors.Validation.class);
     }
 
     @Test
@@ -144,8 +138,7 @@ class PasswordResetServiceTest {
         when(deleted.isDeleted()).thenReturn(true);
         when(accountRepository.findById(any())).thenReturn(Optional.of(deleted));
 
-        assertThatThrownBy(() -> service.resetPassword("valid-token", "NewPassword1234!"))
-            .isInstanceOf(Errors.Validation.class);
+        assertThatThrownBy(() -> service.resetPassword("valid-token", "NewPassword1234!")).isInstanceOf(Errors.Validation.class);
     }
 
     @Test
@@ -178,8 +171,7 @@ class PasswordResetServiceTest {
 
         when(tokenRepository.findByTokenHash(expectedHash)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.resetPassword(rawToken, "NewPassword1234!"))
-            .isInstanceOf(Errors.Validation.class);
+        assertThatThrownBy(() -> service.resetPassword(rawToken, "NewPassword1234!")).isInstanceOf(Errors.Validation.class);
 
         verify(tokenRepository).findByTokenHash(expectedHash);
     }

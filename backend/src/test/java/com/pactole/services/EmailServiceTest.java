@@ -31,7 +31,6 @@ class EmailServiceTest {
     @BeforeEach
     void setUp() {
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
-        // stub all message key lookups (0-arg and 1+ vararg)
         lenient().when(messages.get(anyString())).thenReturn("");
         lenient().when(messages.get(anyString(), (Object) any())).thenReturn("");
         service = new EmailService(mailSender, "from@test.com", messages);
@@ -40,29 +39,24 @@ class EmailServiceTest {
     @Test
     void sendPasswordReset_callsMailSenderSend() {
         service.sendPasswordReset("to@test.com", "Alice", "http://localhost/reset?token=abc");
-
         verify(mailSender).send(mimeMessage);
     }
 
     @Test
     void sendPasswordReset_resolvesSubjectKey() {
         service.sendPasswordReset("to@test.com", "Alice", "http://localhost/reset?token=abc");
-
         verify(messages).get("email.reset.subject");
     }
 
     @Test
     void sendPasswordReset_passesNameToGreeting() {
         service.sendPasswordReset("to@test.com", "Bob", "http://localhost/reset?token=xyz");
-
         verify(messages).get("email.reset.greeting", "Bob");
     }
 
     @Test
     void sendPasswordReset_messagingException_doesNotPropagate() throws Exception {
         doThrow(new MessagingException("SMTP error")).when(mimeMessage).setFrom(any(Address.class));
-
-        assertThatNoException()
-            .isThrownBy(() -> service.sendPasswordReset("to@test.com", "Alice", "http://localhost/reset"));
+        assertThatNoException().isThrownBy(() -> service.sendPasswordReset("to@test.com", "Alice", "http://localhost/reset"));
     }
 }
